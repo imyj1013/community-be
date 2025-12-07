@@ -6,6 +6,8 @@
 사용자는 회원가입, 로그인, 프로필 수정, 비밀번호 변경, 게시글 CRUD, 댓글 CRUD, 좋아요 기능 등을 이용할 수 있습니다.
 또한 BART Transformer 모델을 이용한 **게시글 요약 자동 생성 기능**과 **이미지 업로드 기능**이 포함되어 있습니다.
 
+<img width="1109" height="780" alt="Image" src="https://github.com/user-attachments/assets/37d8f9d3-1230-4666-a2ab-43901435163d" />
+
 ---
 
 ## 프로젝트 구조
