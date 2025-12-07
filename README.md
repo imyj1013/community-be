@@ -1,25 +1,106 @@
-## Setup
-# (optional) create a virtual env
+# **Community Backend (FastAPI + MySQL + AI Summary)**
+
+## 개요
+
+이 백엔드는 FastAPI 기반으로 구현된 커뮤니티 서비스 서버입니다.
+사용자는 회원가입, 로그인, 프로필 수정, 비밀번호 변경, 게시글 CRUD, 댓글 CRUD, 좋아요 기능 등을 이용할 수 있습니다.
+또한 BART Transformer 모델을 이용한 **게시글 요약 자동 생성 기능**과 **이미지 업로드 기능**이 포함되어 있습니다.
+
+---
+
+## 프로젝트 구조
+
 ```
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+backend/
+ ├── app/
+ │   ├── main.py
+ │   ├── db.py
+ │   ├── utils.py        # 인증/유효성 검사/비밀번호 해시 처리
+ │   ├── models/         # DB 처리 로직
+ │   ├── controllers/    # API 로직
+ │   ├── entity/         # SQLAlchemy 모델 (User, Post, Comment, Like)
+ │   ├── routes/         # 라우터 모음
+ ├── create_table.py
+ ├── download_model.py
+ ├── requirements.txt
 ```
-# install tools
+
+---
+
+## 실행 방법
+
+### 1) 가상환경 생성 및 활성화
+
+```bash
+conda create -n env_community python=3.10
+conda activate env_community
 ```
-python -m pip install --upgrade pip
+
+### 2) 패키지 설치
+
+```bash
 pip install -r requirements.txt
 ```
-# download model
-```
-python download_model.py
-```
-# DB Mysql
-```
-mysql -u root -p
-CREATE DATABASE community CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+### 3) MySQL 실행 후 DB 환경변수 수정
+
+`db.py` 내부에 본인의 MySQL 정보 수정.
+
+### 4) 테이블 생성
+
+```bash
 python create_table.py
 ```
-# fast api
-```
+
+### 5) 서버 실행
+
+```bash
 uvicorn app.main:app --reload
 ```
+
+---
+
+## 주요 기능
+
+### 인증 & 세션 관리
+
+* FastAPI SessionMiddleware 사용
+* 로그인 시 세션에 `sessionID`, `user_id`, `email` 저장
+* 모든 인증 필요한 API는 세션 기반으로 검증
+
+### 사용자 기능
+
+* 회원가입 (이메일/닉네임 중복 검사)
+* 로그인 / 로그아웃
+* 프로필 수정 (닉네임 + 프로필 사진)
+* 비밀번호 변경
+* 회원 탈퇴 (CASCADE 적용으로 연관 데이터 자동 삭제)
+
+### 게시글 기능
+
+* 게시글 생성(이미지 업로드 가능)
+* 게시글 요약 자동 생성 (BART 모델 사용)
+* 게시글 목록 조회 (인피니티 스크롤)
+* 게시글 상세조회
+* 게시글 수정 / 삭제
+
+### 댓글 기능
+
+* 댓글 작성 / 수정 / 삭제
+* user_id 기반으로 본인 여부 판단
+* 댓글 작성자 프로필 이미지 지원
+
+### 좋아요 기능
+
+* 좋아요 생성 / 취소
+* 게시글 좋아요 수 자동 반영
+
+### 이미지 업로드
+
+* FastAPI UploadFile로 이미지 수신
+* `/image/*` 형태로 정적 파일 제공
+* UUID 기반 파일명 저장
+
+### 게시글 자동 요약 기능
+
+* Transformer 모델(BART)을 이용해 게시글 본문을 받아 summary를 생성한다.
